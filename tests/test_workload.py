@@ -1,13 +1,6 @@
-"""TST-1 (parte workloads): pruebas de make_mix / make_workload / miss_rate.
-
-AJUSTA la ruta del import a donde quedó el módulo en tu repo
-(por ejemplo cbp.model.workloads). Necesitas el paquete instalado
-(pip install -e .) o correr pytest desde la raíz con src en el path.
-"""
 import numpy as np
 import pytest
-
-from cbp.model.workloads import KINDS, PROFILES, make_mix, make_workload  # <- ajustar
+from cbp.model.workload import KINDS, PROFILES, make_mix, make_workload
 
 SEEDS = range(20)
 C_MAX = 64
