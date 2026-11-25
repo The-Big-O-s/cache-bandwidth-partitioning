@@ -1,16 +1,9 @@
 """ALG-2: equal-split baseline."""
 from __future__ import annotations
-from collections.abc import Sequence
-from typing import NamedTuple
-from cbp.model.performance import DEFAULT_PARAMS, Evaluation, PerfParams, evaluate
-from cbp.model.workload import Workload
+import time
+from cbp.model.problem import Problem, Result
 
-__all__ = ["EqualSplit", "split_evenly", "equal_split"]
-
-class EqualSplit(NamedTuple):
-    cache: list[int]        # cache units given to each app
-    bandwidth: list[int]    # bandwidth units given to each app
-    evaluation: Evaluation  # score, per-app performance and QoS check
+__all__ = ["split_evenly", "equal_split"]
 
 def split_evenly(total: int, n: int) -> list[int]:
     """Split `total` units among `n` apps; shares differ by at most 1."""
@@ -21,28 +14,17 @@ def split_evenly(total: int, n: int) -> list[int]:
     base, remainder = divmod(total, n)
     return [base + (1 if i < remainder else 0) for i in range(n)]
 
-def equal_split(
-    workloads: Sequence[Workload],
-    cache_budget: int,
-    bandwidth_budget: int,
-    objective: str = "sum",
-    qos: float | Sequence[float] | None = None,
-    params: PerfParams = DEFAULT_PARAMS,
-) -> EqualSplit:
-    """Split both budgets equally among the workloads and evaluate the result.
-    `evaluation.qos_met` is False when the equal split violates QoS.
+def equal_split(problem: Problem) -> Result:
+    """Split C and B equally among the apps and return the scored Result.
+    `result.feasible` is False when the equal split violates QoS.
     """
-    n = len(workloads)
-    cache = split_evenly(cache_budget, n)
-    bandwidth = split_evenly(bandwidth_budget, n)
-    evaluation = evaluate(
-        workloads,
+    t0 = time.perf_counter()
+    cache = split_evenly(problem.C, problem.n)
+    bandwidth = split_evenly(problem.B, problem.n)
+    return problem.result(
         cache,
         bandwidth,
-        objective=objective,
-        qos=qos,
-        params=params,
-        cache_budget=cache_budget,
-        bandwidth_budget=bandwidth_budget,
+        evaluated=1,
+        seconds=time.perf_counter() - t0,
+        algorithm="equal_split",
     )
-    return EqualSplit(cache, bandwidth, evaluation)
