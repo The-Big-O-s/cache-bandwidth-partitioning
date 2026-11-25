@@ -29,8 +29,8 @@ def _w(kind, seed=0):
 def test_perf_monotone_in_cache_and_bandwidth(kind, seed):
     w = _w(kind, seed)
     grid = np.array([[perf(w, c, b) for b in B_GRID] for c in C_GRID])
-    assert np.all(np.diff(grid, axis=0) >= -TOL)  # more cache never hurts
-    assert np.all(np.diff(grid, axis=1) >= -TOL)  # more bandwidth never hurts
+    assert np.all(np.diff(grid, axis=0) >= -TOL)  
+    assert np.all(np.diff(grid, axis=1) >= -TOL)  
 
 
 @pytest.mark.parametrize("kind", KINDS)
@@ -43,7 +43,7 @@ def test_perf_is_positive_and_below_max(kind):
 
 def test_bandwidth_limit_binds_when_b_is_small():
     w = _w("streaming")
-    assert perf(w, 0, 0.0) == 0.0  # no bandwidth -> no progress
+    assert perf(w, 0, 0.0) == 0.0  
     small = perf(w, 0, 0.05)
     assert small < perf(w, 0, HUGE)
     mpi = w.mem_intensity / 1000.0 * w.miss_rate(0)
@@ -56,7 +56,6 @@ def test_miss_penalty_is_included():
     cheap = perf(w, 0, HUGE, PerfParams(miss_penalty=50.0))
     costly = perf(w, 0, HUGE, PerfParams(miss_penalty=200.0))
     assert costly < cheap
-    # With no penalty, performance is just 1 / base_cpi, whatever the cache.
     free = PerfParams(miss_penalty=0.0)
     assert perf(w, 0, HUGE, free) == pytest.approx(1.0 / w.base_cpi)
     assert perf(w, 32, HUGE, free) == pytest.approx(1.0 / w.base_cpi)
@@ -132,9 +131,9 @@ def test_qos_per_app_thresholds():
 def test_evaluate_input_validation():
     mix = make_mix(3, seed=1)
     with pytest.raises(ValueError):
-        evaluate(mix, [1, 1], [1, 1, 1])   # wrong length
+        evaluate(mix, [1, 1], [1, 1, 1])   
     with pytest.raises(ValueError):
-        evaluate(mix, [1, -1, 1], [1, 1, 1])  # negative
+        evaluate(mix, [1, -1, 1], [1, 1, 1])  
     with pytest.raises(ValueError):
         evaluate([], [], [])
 
@@ -145,4 +144,4 @@ def test_budgets_are_enforced_when_given():
         evaluate(mix, [8] * 4, [4] * 4, cache_budget=16)
     with pytest.raises(ValueError):
         evaluate(mix, [8] * 4, [4] * 4, bandwidth_budget=10)
-    evaluate(mix, [8] * 4, [4] * 4, cache_budget=32, bandwidth_budget=16)  # exact fit is fine
+    evaluate(mix, [8] * 4, [4] * 4, cache_budget=32, bandwidth_budget=16)  

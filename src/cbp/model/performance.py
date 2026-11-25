@@ -48,7 +48,6 @@ def _misses_per_instruction(w: Workload, c: float) -> float:
 
 
 def perf(w: Workload, c: float, b: float, params: PerfParams = DEFAULT_PARAMS) -> float:
-    """Performance (IPC) of one program with c cache units and b bandwidth units."""
     c = float(c)
     b = float(b)
     if c < 0:
@@ -65,7 +64,6 @@ def perf(w: Workload, c: float, b: float, params: PerfParams = DEFAULT_PARAMS) -
 
 
 def max_perf(w: Workload, params: PerfParams = DEFAULT_PARAMS) -> float:
-    """Best possible performance: unlimited cache (miss rate = floor) and bandwidth."""
     mpi = w.mem_intensity / 1000.0 * w.floor
     return 1.0 / (w.base_cpi + mpi * params.miss_penalty)
 
@@ -104,12 +102,7 @@ def evaluate(
     cache_budget: float | None = None,
     bandwidth_budget: float | None = None,
 ) -> Evaluation:
-    """Evaluate one joint allocation (cache[i], bandwidth[i] for each app i).
-
-    qos: minimum fraction (0..1) of its max_perf that each app must reach.
-         A single number applies to all apps; None means no QoS requirement.
-    cache_budget / bandwidth_budget: if given, the allocation must not exceed them.
-    """
+ 
     if objective not in OBJECTIVES:
         raise ValueError(f"unknown objective {objective!r}; expected one of {OBJECTIVES}")
     n = len(workloads)
